@@ -1,0 +1,58 @@
+version: '3'
+services:
+  virtuoso:
+    image: ${VIRTUOSO_DOCKER_IMAGE}
+    environment:
+      DBA_PASSWORD: ${VIRTUOSO_DBA_PASSWORD}
+      VIRT_Parameters_DirsAllowed: "., ../vad, /usr/share/proj, /database, /data"
+      VIRT_Parameters_NumberOfBuffers: ${NumOfBuffers}
+      VIRT_Parameters_MaxDirtyBuffers: ${MaxDirtyBuffers}
+      VIRT_Client_SQL_PREFETCH_ROWS: "10000"
+      VIRT_Client_SQL_PREFETCH_BYTES: "160000"
+      VIRT_SPARQL_ResultSetMaxRows: "1000000"
+      VIRT_SPARQL_MaxSortedTopRows: "100000"
+      VIRT_SPARQL_MaxQueryExecutionTime: "300"
+      VIRT_SPARQL_MaxQueryCostEstimationTime: "-1"
+    volumes:
+      - ${DB_DIR}:/database
+      - ${DATA_DIR}:/data
+    ports:
+      - "${VIRTUOSO_PORT}:8890"
+    restart: always
+
+  sparql-proxy:
+    image: ${SPARQL_PROXY_DOCKER_IMAGE}
+    container_name: sparql-proxy
+    depends_on:
+      - virtuoso
+    environment:
+      PORT: ${SPARQL_PROXY_PORT}
+      SPARQL_BACKEND: http://virtuoso:${VIRTUOSO_PORT}/sparql
+      ADMIN_USER: admin
+      ADMIN_PASSWORD: password
+    ports:
+      - "${SPARQL_PROXY_PORT}:${SPARQL_PROXY_PORT}"
+    restart: always
+
+  grasp:
+    image: ${GRASP_DOCKER_IMAGE}
+    container_name: grasp
+    environment:
+      PORT: ${GRASP_PORT}
+      RESOURCES_DIR: /resources
+    volumes:
+      - ${GRASP_RESOURCE_DIR}:/resources
+    ports:
+      - "${GRASP_PORT}:${GRASP_PORT}"
+    restart: always
+
+  nginx:
+    image: nginx:1.17
+    container_name: nginx
+    depends_on:
+      - sparql-proxy
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    restart: always
