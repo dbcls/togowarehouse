@@ -1,0 +1,4 @@
+[submodule "src/endpoint_browser"]
+	path = src/endpoint_browser
+	url = https://github.com/inutano/endpoint_browser
+	branch = togowarehouse
