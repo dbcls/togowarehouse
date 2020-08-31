@@ -52,7 +52,7 @@ services:
     environment:
       PORT: ${SPARQLIST_PORT}
       ADMIN_PASSWORD: ${SPARQLIST_ADMIN_PASS}
-      ROOT_PATH: "/"
+      ROOT_PATH: "/sparqlist/"
     ports:
       - ${SPARQLIST_PORT}:${SPARQLIST_PORT}
     volumes:
