@@ -53,8 +53,6 @@ services:
       PORT: ${SPARQLIST_PORT}
       ADMIN_PASSWORD: ${SPARQLIST_ADMIN_PASS}
       ROOT_PATH: "/"
-    networks:
-      - default
     ports:
       - ${SPARQLIST_PORT}:${SPARQLIST_PORT}
     volumes:
@@ -65,8 +63,6 @@ services:
   endpoint_browser:
     image: inutano/endpoint-browser:snapshot-56a7fbf
     container_name: endpoint_browser
-    networks:
-      - default
     ports:
       - 8080:8080
 
